@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import argparse
+import sqlite3
 import sys
+from pathlib import Path
 
 from .image_validation import validate_images
 from .image_inspection import inspect_image_set, write_manifest
 from .sparse_reconstruction import ReconstructionError, run_sparse_reconstruction
+from .reconstruction_diagnostics import diagnose_sparse_reconstruction
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -22,6 +25,9 @@ def main(argv: list[str] | None = None) -> int:
     reconstruct.add_argument("--input", required=True, help="directory containing terrain photographs")
     reconstruct.add_argument("--output", required=True, help="reconstruction workspace directory")
     reconstruct.add_argument("--camera-mode", choices=("single", "per-image"), default="single")
+    diagnose = commands.add_parser("diagnose-sparse", help="analyze COLMAP matches, registration, and calibration")
+    diagnose.add_argument("--reconstruction", required=True, help="existing COLMAP reconstruction workspace")
+    diagnose.add_argument("--output", required=True, help="directory for diagnostic JSON, PNG, and Markdown")
     args = parser.parse_args(argv)
 
     if args.command == "reconstruct-sparse":
@@ -48,6 +54,19 @@ def main(argv: list[str] | None = None) -> int:
         for warning in report["warnings"]:
             print(f"Warning: {warning}")
         print(f"Overall reconstruction result: {report['result_status']}")
+        return 0
+
+    if args.command == "diagnose-sparse":
+        try:
+            outputs = diagnose_sparse_reconstruction(
+                Path(args.reconstruction) / "database.db", args.reconstruction, args.output
+            )
+        except (FileNotFoundError, ValueError, OSError, sqlite3.Error) as exc:
+            print(f"Sparse diagnostics failed: {exc}", file=sys.stderr)
+            return 1
+        print(f"Image statistics: {outputs['statistics']}")
+        print(f"Matching graph: {outputs['graph']}")
+        print(f"Diagnostic report: {outputs['report']}")
         return 0
 
     if args.command == "inspect-image-set":

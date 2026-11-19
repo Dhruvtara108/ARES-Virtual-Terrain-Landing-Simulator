@@ -82,3 +82,17 @@ GPU processing, and caps the longest image side at 1600 pixels. Camera mode
 calibrations. Databases, model files, point clouds, logs, and the statistics
 report remain in the selected output directory. No dense reconstruction or
 mesh is produced.
+
+## Diagnose sparse matching and registration
+
+Analyze an existing COLMAP workspace without changing its database or model:
+
+```bash
+python -m ares_terrain.cli diagnose-sparse \
+  --reconstruction data/terrain_dataset/reconstruction \
+  --output data/terrain_dataset/reconstruction/diagnostics
+```
+
+The command exports pair and keypoint statistics as JSON, a verified matching
+graph as PNG, and a Markdown report covering registration and fitted camera
+parameters. Outputs are generated locally under the ignored `data/` directory.
