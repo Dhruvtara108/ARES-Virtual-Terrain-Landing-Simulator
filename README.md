@@ -131,3 +131,10 @@ project the original photographs onto that validated mesh. Only then should
 the mesh and textures be exported to a Three.js scene, with a separately
 specified rocket model, collision surface, coordinate scale, gravity, and
 landing controls. No mesh or placeholder environment is generated here.
+
+## HLoc learned-feature experiment in Google Colab
+
+Open [`notebooks/ares_hloc_reconstruction.ipynb`](notebooks/ares_hloc_reconstruction.ipynb)
+in Google Colab ([open this branch's notebook](https://colab.research.google.com/github/Dhruvtara108/ARES-Virtual-Terrain-Landing-Simulator/blob/feature/part-1-terrain-reconstruction/notebooks/ares_hloc_reconstruction.ipynb)). In Colab, select a GPU runtime, run cells from top to bottom, and upload the ready-made `data/terrain_dataset/ares_hloc_photos.zip` containing the existing 22 unique images. The ZIP is ignored by Git. The notebook follows the [official HLoc SfM notebook](https://github.com/cvg/Hierarchical-Localization/blob/master/pipeline_SfM.ipynb) and uses its upstream `extract_features.main`, `pairs_from_exhaustive.main`, `match_features.main`, and `reconstruction.main` interfaces with SuperPoint, LightGlue, and PyCOLMAP.
+
+The notebook shares a SIMPLE_RADIAL camera and fixes its initial `[1920, 800, 450, 0]` parameters during bundle adjustment. The focal length is COLMAP's default heuristic, not an independently measured phone calibration. Results and the report are written to `/content/ares_hloc_outputs/`; the notebook displays sparse points and camera centers and offers `points3D.ply` for download. The PLY contains sparse landmarks, not a dense cloud or terrain mesh. Local pytest tests validate the notebook JSON, ZIP handling, output paths, deterministic image ordering, and report calculations without installing HLoc or PyTorch locally.
