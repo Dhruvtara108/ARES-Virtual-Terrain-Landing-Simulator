@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+
+# Local datasets and generated verification images
+data/
+test_data/
+generated_test_images/
+
+# Editors
+.vscode/
+.idea/
