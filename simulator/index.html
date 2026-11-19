@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0a111a" />
+    <meta name="description" content="ARES procedural rocket landing simulation prototype" />
+    <title>ARES | Lunar Landing Test</title>
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="ARES simulator home"><span class="brand-mark">A</span><span>ARES <small>FLIGHT SYSTEMS</small></span></a>
+        <div class="mission-chip"><i></i> SIMULATION LIVE <span class="divider">/</span> TEST FLIGHT 01</div>
+        <div class="env-label"><span>●</span> PROCEDURAL TEST ENVIRONMENT</div>
+      </header>
+      <main class="sim-layout">
+        <section class="viewport-wrap" aria-label="Interactive three dimensional lunar landing simulation">
+          <div id="viewport"></div>
+          <div class="viewport-vignette"></div>
+          <div class="view-label"><span class="label-kicker">ARES • DESCENT TEST</span><strong>SELENE / PAD 01</strong><small>LOCAL FRAME · METRIC</small></div>
+          <div class="altitude-ruler"><span>ALTITUDE</span><strong id="altitude-large">—</strong><small>METERS AGL</small><div class="ruler-line"><i></i></div></div>
+          <div class="view-controls"><span class="live-dot"></span><span id="view-mode">ORBIT VIEW</span><span class="view-sep">·</span> DRAG TO ORBIT</div>
+          <div id="result-banner" class="result-banner hidden" role="status"><span class="result-icon">✓</span><div><small>FLIGHT RESULT</small><strong id="result-title">SAFE LANDING</strong><p id="result-detail"></p></div></div>
+        </section>
+        <aside class="side-panel">
+          <section class="panel-section telemetry">
+            <div class="section-heading"><div><span class="eyebrow">FLIGHT TELEMETRY</span><h1>Descent monitor</h1></div><span class="telemetry-dot" id="telemetry-dot"></span></div>
+            <div class="status-row"><span>FLIGHT STATUS</span><strong id="flight-status">STANDBY</strong></div>
+            <div class="metric-grid">
+              <article class="metric-card"><span>ALTITUDE <small>AGL</small></span><strong id="altitude-value">—</strong><em>m</em><div class="metric-track"><i id="altitude-bar"></i></div></article>
+              <article class="metric-card"><span>VERTICAL SPEED</span><strong id="vertical-speed">—</strong><em>m/s</em><small class="metric-caption">DOWNWARD</small></article>
+              <article class="metric-card"><span>HORIZONTAL SPEED</span><strong id="horizontal-speed">—</strong><em>m/s</em><small class="metric-caption">GROUND RELATIVE</small></article>
+              <article class="metric-card"><span>MISSION TIME</span><strong id="mission-time">00:00</strong><em>min:sec</em><small class="metric-caption">FLIGHT ELAPSED</small></article>
+            </div>
+            <div class="fuel-block"><div class="fuel-label"><span>PROPELLANT RESERVE</span><strong id="fuel-value">100%</strong></div><div class="fuel-track"><i id="fuel-bar"></i></div></div>
+            <div class="throttle-block"><div class="fuel-label"><span>ENGINE THROTTLE</span><strong id="throttle-value">0%</strong></div><div class="throttle-track"><i id="throttle-bar"></i></div></div>
+            <div class="attitude-grid"><div><span>PITCH</span><strong id="pitch-value">0.0°</strong></div><div class="attitude-indicator"><i id="attitude-dot"></i><b></b></div><div><span>ROLL</span><strong id="roll-value">0.0°</strong></div></div>
+          </section>
+          <section class="panel-section mission-control">
+            <div class="section-heading"><div><span class="eyebrow">MISSION CONTROL</span><h2>Flight computer</h2></div><span class="computer-tag">FC / 01</span></div>
+            <button class="primary-button" id="start-auto"><span class="button-icon">⌁</span> START AUTONOMOUS LANDING <span class="button-arrow">↗</span></button>
+            <div class="button-row"><button class="secondary-button" id="start-manual">START MANUAL MODE</button><button class="secondary-button pause-button" id="pause-button" disabled>Ⅱ PAUSE</button></div>
+            <div class="button-row"><button class="text-button" id="reset-button">↺ RESET SIMULATION</button><button class="text-button" id="follow-button">◎ CAMERA FOLLOW <i id="follow-state">OFF</i></button></div>
+            <div class="control-hint" id="mode-hint">AUTOPILOT READY · SELECT A FLIGHT MODE</div>
+          </section>
+          <section class="panel-section manual-controls">
+            <div class="section-heading"><div><span class="eyebrow">PILOT INPUTS</span><h2>Manual controls</h2></div><span class="manual-tag">KEYBOARD</span></div>
+            <div class="keys-grid"><div class="key-item"><kbd>W</kbd><span>THROTTLE UP</span></div><div class="key-item"><kbd>S</kbd><span>THROTTLE DOWN</span></div><div class="key-item"><kbd>←</kbd><span>PITCH LEFT</span></div><div class="key-item"><kbd>→</kbd><span>PITCH RIGHT</span></div><div class="key-item"><kbd>↑</kbd><span>ROLL UP</span></div><div class="key-item"><kbd>↓</kbd><span>ROLL DOWN</span></div><div class="key-item"><kbd>SPACE</kbd><span>PAUSE / RESUME</span></div><div class="key-item"><kbd>R</kbd><span>RESET FLIGHT</span></div></div>
+          </section>
+          <footer class="panel-footer"><span>ARES SIMULATION LAB</span><span>PROTOTYPE 0.1</span><span>NO TERRAIN DATA</span></footer>
+        </aside>
+      </main>
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
