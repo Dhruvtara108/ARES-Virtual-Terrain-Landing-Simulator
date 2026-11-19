@@ -7,6 +7,7 @@ import sys
 
 from .image_validation import validate_images
 from .image_inspection import inspect_image_set, write_manifest
+from .sparse_reconstruction import ReconstructionError, run_sparse_reconstruction
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -17,7 +18,37 @@ def main(argv: list[str] | None = None) -> int:
     inspect = commands.add_parser("inspect-image-set", help="inspect images and write a dataset manifest")
     inspect.add_argument("--input", required=True, help="image file or directory of images")
     inspect.add_argument("--output", required=True, help="path for the JSON manifest")
+    reconstruct = commands.add_parser("reconstruct-sparse", help="run CPU sparse reconstruction with COLMAP")
+    reconstruct.add_argument("--input", required=True, help="directory containing terrain photographs")
+    reconstruct.add_argument("--output", required=True, help="reconstruction workspace directory")
+    reconstruct.add_argument("--camera-mode", choices=("single", "per-image"), default="single")
     args = parser.parse_args(argv)
+
+    if args.command == "reconstruct-sparse":
+        try:
+            result = run_sparse_reconstruction(args.input, args.output, args.camera_mode)
+        except FileNotFoundError as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
+        except (ReconstructionError, ValueError, OSError) as exc:
+            print(f"Sparse reconstruction failed: {exc}", file=sys.stderr)
+            return 1
+
+        report = result.report
+        print(f"Total input photographs: {report['input_photographs']}")
+        print(f"Registered photographs: {report['registered_photographs']}")
+        print(f"Unregistered photographs: {report['unregistered_photographs']}")
+        print(f"Cameras: {report['cameras']}")
+        print(f"Reconstructed 3D points: {report['points_3d']}")
+        print(f"Sparse model: {report['sparse_model_path']}")
+        print(f"PLY point cloud: {report['ply_path']}")
+        print(f"Processing time: {report['processing_seconds']} seconds")
+        print(f"Camera positions: {len(report['camera_positions'])}")
+        print(f"Statistics report: {result.report_path}")
+        for warning in report["warnings"]:
+            print(f"Warning: {warning}")
+        print(f"Overall reconstruction result: {report['result_status']}")
+        return 0
 
     if args.command == "inspect-image-set":
         try:

@@ -61,3 +61,24 @@ Run tests with:
 ```bash
 pytest
 ```
+
+## Sparse COLMAP reconstruction
+
+With COLMAP installed, run a CPU-only sparse reconstruction on a directory of
+validated photographs:
+
+```bash
+python -m ares_terrain.cli reconstruct-sparse \
+  --input data/terrain_dataset/raw \
+  --output data/terrain_dataset/reconstruction \
+  --camera-mode single
+```
+
+COLMAP runs SIFT extraction, exhaustive matching with geometric verification,
+incremental mapping, model analysis, and sparse PLY export. The pipeline uses
+`SIMPLE_RADIAL`, limits extraction and matching to four CPU threads, disables
+GPU processing, and caps the longest image side at 1600 pixels. Camera mode
+`single` shares calibration across images; `per-image` creates separate camera
+calibrations. Databases, model files, point clouds, logs, and the statistics
+report remain in the selected output directory. No dense reconstruction or
+mesh is produced.
