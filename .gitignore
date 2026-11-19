@@ -10,6 +10,9 @@ venv/
 data/
 test_data/
 generated_test_images/
+manifests/
+output/
+*.manifest.json
 
 # Editors
 .vscode/

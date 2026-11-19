@@ -6,6 +6,7 @@ import argparse
 import sys
 
 from .image_validation import validate_images
+from .image_inspection import inspect_image_set, write_manifest
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -13,7 +14,42 @@ def main(argv: list[str] | None = None) -> int:
     commands = parser.add_subparsers(dest="command", required=True)
     validate = commands.add_parser("validate-images", help="validate image files for reconstruction")
     validate.add_argument("--input", required=True, help="image file or directory of images")
+    inspect = commands.add_parser("inspect-image-set", help="inspect images and write a dataset manifest")
+    inspect.add_argument("--input", required=True, help="image file or directory of images")
+    inspect.add_argument("--output", required=True, help="path for the JSON manifest")
     args = parser.parse_args(argv)
+
+    if args.command == "inspect-image-set":
+        try:
+            inspection = inspect_image_set(args.input)
+        except FileNotFoundError as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 2
+        except OSError as exc:
+            print(f"Inspection failed: {exc}", file=sys.stderr)
+            return 1
+        try:
+            output_path = write_manifest(inspection.manifest, args.output)
+        except OSError as exc:
+            print(f"Invalid output path: {exc}", file=sys.stderr)
+            return 2
+
+        summary = inspection.manifest["summary"]
+        images = inspection.manifest["images"]
+        camera_available = sum(bool(image["camera_manufacturer"] and image["camera_model"]) for image in images)
+        focal_available = sum(image["focal_length_mm"] is not None for image in images)
+        print(f"Total files discovered: {inspection.total_files}")
+        print(f"Valid images: {summary['valid_images']}")
+        print(f"Unique images: {summary['unique_images']}")
+        print(f"Duplicate images: {summary['duplicate_images']}")
+        print(f"Camera manufacturer/model available: {camera_available}/{len(images)}")
+        print(f"Focal length available: {focal_available}/{len(images)}")
+        for warning in inspection.manifest["warnings"]:
+            print(f"Warning: {warning}")
+        print(f"Manifest: {output_path}")
+        result = summary["unique_images"] >= 2
+        print(f"Overall inspection result: {'PASS' if result else 'FAIL'}")
+        return 0 if result else 1
 
     try:
         report = validate_images(args.input)

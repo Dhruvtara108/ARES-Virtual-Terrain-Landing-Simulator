@@ -37,6 +37,25 @@ valid images are present, 1 when validation fails, or 2 for an invalid input
 path. Approximately 20–30 overlapping photographs are recommended for the
 intended reconstruction workflow. Original files are never modified.
 
+## Inspect an image set
+
+Create a JSON manifest with file hashes, image dimensions and format, selected
+camera EXIF fields (when present), and duplicate groups:
+
+```bash
+python -m ares_terrain.cli inspect-image-set \
+  --input PATH_TO_IMAGES \
+  --output output/terrain-manifest.json
+```
+
+The command creates missing output directories and reports the discovered,
+valid, unique, and duplicate image counts. Identical files are counted once
+toward reconstruction readiness, but no files are deleted or changed. The
+manifest omits GPS and capture timestamps. It recommends overlapping photos
+and explicitly states that overlap has not been verified. Exit code 0 means
+at least two unique valid images, 1 means inspection failed or there are fewer
+than two unique images, and 2 means the input or output path is invalid.
+
 Run tests with:
 
 ```bash
