@@ -96,3 +96,38 @@ python -m ares_terrain.cli diagnose-sparse \
 The command exports pair and keypoint statistics as JSON, a verified matching
 graph as PNG, and a Markdown report covering registration and fitted camera
 parameters. Outputs are generated locally under the ignored `data/` directory.
+
+## Reconstruction recovery experiments
+
+`src/ares_terrain/reconstruction_experiments.py` defines isolated, CPU-only
+COLMAP experiments for the existing photo sequence. Each run has its own
+database, logs, sparse model, text export, PLY, and JSON metrics under
+`data/terrain_dataset/experiments/`. Run the matrix with:
+
+```bash
+python -c 'from pathlib import Path; from ares_terrain.reconstruction_experiments import EXPERIMENTS, run_experiment; root=Path("data/terrain_dataset/experiments"); root.mkdir(exist_ok=True); [run_experiment("data/terrain_dataset/raw", root/c.name, c) for c in EXPERIMENTS]'
+```
+
+The experiments compare exhaustive and sequential matching (three-image
+overlap), a modest mapper threshold change, and `SIMPLE_RADIAL` versus
+`SIMPLE_PINHOLE`. The experiment outputs are local artifacts and remain
+excluded from Git. See `data/terrain_dataset/experiments/summary.md` for the
+recorded comparison. The experiments currently do not yield a stable model
+usable for dense reconstruction; the preserved baseline remains the strongest
+sparse result.
+
+### Path to a virtual environment
+
+The sparse COLMAP model supplies camera poses and sparse landmarks only; it is
+not a walkable surface or terrain mesh. Proceed only after obtaining a
+geometrically stable, sufficiently overlapping reconstruction. Dense MVS would
+then require image undistortion and PatchMatch stereo, followed by stereo
+fusion to a dense cloud. This installed COLMAP 3.9.1 build reports that it was
+compiled without CUDA and `patch_match_stereo` exits with a CUDA requirement,
+so dense MVS cannot run in this environment. Mesh generation would need an
+independent CPU capable mesher (or a CUDA enabled COLMAP build installed
+elsewhere), then validation and hole handling. Texture generation would
+project the original photographs onto that validated mesh. Only then should
+the mesh and textures be exported to a Three.js scene, with a separately
+specified rocket model, collision surface, coordinate scale, gravity, and
+landing controls. No mesh or placeholder environment is generated here.
